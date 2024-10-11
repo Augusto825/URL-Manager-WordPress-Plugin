@@ -1,0 +1,129 @@
+Blockchain is fascinating. I don't need that right now. for now, I need a script to check old lists of urls to new lists of urls. For example, there are 1000 URLs in a csv file, and or WordPress database. Suddenly another 1000 URLs are added, but 527 of the new URLs are already in the old list. The script would remove the old URLs from the new list or filter out the old URLs.
+Hello. Yes. You or your team. WordPress plugin to sort / filter / clean lists of URLs. Be able to look at the existing URLs in the database, and compare it to a new .csv list of URLs. Write only the URLs that are not already in the database.
+
+OK you can work locally for a bit. I will also have a development WordPress server for you shortly. Here are 2 example URL sets. We will try this in the Database and the .csv file to see which is faster.
+
+https://drinkklarity.com/wp-admin/
+freelancer-admin
+Freelance2024@100PM
+
+
+
+FTP
+USER: freelancer@drinkklarity.com
+PASS: Freelance2024@100PM
+
+
+
+FTP Username: freelancer@drinkklarity.com
+FTP server: ftp.malachairising.com
+FTP & explicit FTPS port: 21
+
+we will have to lay that out. yes. wp-content is where the lists can be and be saved to. Let also try in the database. I can import the old list as posts. not sure how we can import from a .csv file to WordPress database. i know there is a way, but I forget how to do that.
+
+importing posts in the dashboard is quick. I mean I don't know how to import from a .csv file that is in the wp-content folder.
+Maybe. Lets talk it through. We need it to sort the old list and the new list. Check for old URLs and leave the newer URLs.
+This new list will be used in a different process.
+We want to discover the best way to do that in a plugin form, so it can be deployed quickly elsewhere. Some of the answers we are looking for are... Can we use the .csv file or do we need the database? Which method is faster?
+The secondary goal is usability. Do we allow users to upload files, or do we limit to only watching the folder for new files to appear.
+I am a dreamer here, so I will leave it to you to guide us to what is possible.
+Think science rather than final product. Bare bones simple, simple, simple. Just to prove it works.
+
+Currently we get the URLs in a .csv file. What we do with them is the question. Also, maybe we should not receive .csv files and make the delivery into the database.
+
+ok. great. Putting all of the URLs in the same table in the database might be good. Perhaps we can add a column with keyword or file name so we can sort different groups of URLs. We can force users to match the .csv filenames.
+
+For example, in the database, we could have a row structure like
+
+
+
+url_id | url | url_list_name | date_added
+
+
+
+url_list_name can be the name of the ,csv file.
+
+
+
+or
+
+
+
+url_id | url | list_keyword | date_added
+
+
+
+list_keyword can be the topic that generated the URLs
+
+
+
+That way we can return URLs from certain lists or keywords, and make sure the new lists are checking against the correct older lists.
+
+I can add a function during the list generation to include the keyword used to create the list as a column in the list.
+Is it faster to use the database to update the lists or is it faster to use .csv files?
+
+ok. Currently we have a search function that creates the .csv files you are working with. The reason for that is... up to this point, we have needed to access those lists from a folder. After today, or in a few days, we may be able to save and access those lists directly to and from the database.
+
+
+
+Your plugin currently filters the new list to exclude the old list?
+
+OK, let’s focus on that for now and get that CSV inside of folder functionality working. How do you want the files to be named so that your plug-in will be able to keep them straight. For example, file one old and file one new. Can you keep track of which list you have checked already and need to be checked now going forward?
+
+Let imagine for now we have 5 months of lists in the folder. We add 10 new lists. 5 of them match 5 of the old lists. 5 are brand new.
+
+Sorry. Correction… “5 old lists” in the folder…
+
+Yes, you will need to make changes as we go. We are testing the best way to do things, and there will be dead ends and failures that lead us to the best way. Completely starting over is most likely not necessary. I will pay you for the work you do and I hope you are enthusiastic toward making something awesome. I will add more to the budget to help you adjust to this way of doing things. We are testing, finding, inventing, trying many ways until we find the best way.
+
+
+
+To be clear, in this case, we are looking for the best way to compare a new lists of URLs to an existing old lists of URLs. There are many questions to explore to find the best way. We can design this anyway possible. What is the absolute best way? At the end, we should have something that anyone can use to filter new lists with the old lists. Should the URLs be in the database, should the URLs be in .csv? Other? Since we are making this as a plugin, should we include ways for users to upload lists in bulk or be able to add a single URL to the list or be forced to upload .csv files only?
+
+
+Try various ways to find the best way to allow a user to add new lists of URLs to a database or folder, and filter out URLs that are already in the old lists from the new lists. This presents other issues to solve as well. What is the best way to add the original lists and the new lists? What is the best way to label lists so the system knows which lists to compare? What is the best way to save or export the new (cleaned) list? We will adjust the project and budget as needed as we go. We will discuss possible solutions in advance to minimize the amount of work.
+
+
+What do you value most in the quality of a plugin? I will try my best to implement your priorities and ideas into reality.
+
+Even if we start storing them with a date, it will still have to check if the URL already exists.
+
+very good. we are bound for success.
+We need to create an accurate diagram for the project.
+In the dashboard, for user interface perhaps we have a text box to type a single URL and a select file button to upload .csv URL files and a submit button.
+
+im here.
+
+same time.... hmmmm. good question. should we even allow that? is it possible to allow both or one or the other? If yes, I can see where someone wants to add just one URL.
+
+The minimum is to allow for .csv uploads
+
+perhaps they choose before they hit submit. Only allow one or the other, but not both.
+
+so, not both at the same time. one or the other
+
+
+priority to the .csv file, so if they did enter a single URL and select a file, it will only upload .csv file.
+
+both would be amazing! there is another piece that is being made to read these URLs. So far it only works for .csv files but they should have it able to pull from the database soon.
+There is a custom post type function. it creates a custom post page in the dashboard that lists all the custom posts. If we treat each URL as a custom post, we can use the built in WordPress function.
+The reason to make a different setup to manage URL could be speed, but I don't see much editing of the URLs or deleting them.
+I think the built in WordPress list of custom posts will work.
+Upload .csv file.
+Compare new list to existing list.
+Save new list without the existing URLs
+Create custom posts from new list of URLs
+
+or
+Upload .csv file.
+Compare new list to existing URL custom posts
+Save new list without the existing URLs as URL custom posts
+If we are creating a new custom post from each URL...
+right. we are discussing. let's play it out. talk it out to see what it can be.
+
+custom post type is just another way to make a list in WordPress. rather than write to .csv, write to post.
+
+Yes. I think so. There may be other ways to add them to the database. I think row by row will be better than all in an array or something grouped together. There could be tens of thousands or URLs in the future. The WordPress post structure is already designed to handle a large number of entries.
+Each URL as a custom post seems a good contender.
+
+Yes, I am wondering if DB will be faster than csv file
