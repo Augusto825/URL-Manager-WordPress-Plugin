@@ -2,7 +2,7 @@
 /*
 Plugin Name: URL Manager 2024
 Description: A plugin to manage and store URLs, remove duplicates, and upload URLs via CSV.
-Version: 12.1
+Version: 3.2
 Author: Luis Fernando
 */
 
@@ -77,14 +77,20 @@ function url_manager_2024_handle_submission() {
         global $wpdb;
         $table_name = $wpdb->prefix . 'url_manager_2024';
 
+        $new_urls = array();
+
         // Handle manual URL input
         if (!empty($_POST['url_list'])) {
             $url_list = explode("\n", sanitize_textarea_field($_POST['url_list']));
             foreach ($url_list as $url) {
                 $url = trim($url);
                 if (!empty($url)) {
-                    // Insert URL if not a duplicate
-                    $wpdb->insert($table_name, array('url' => $url, 'url_list_name' => 'Manual'));
+                    // Check if URL already exists in the database
+                    $existing_url = $wpdb->get_var($wpdb->prepare("SELECT url FROM $table_name WHERE url = %s", $url));
+                    if (!$existing_url) {
+                        $wpdb->insert($table_name, array('url' => $url, 'url_list_name' => 'Manual'));
+                        $new_urls[] = $url;  // Store new URL for CSV creation later
+                    }
                 }
             }
         }
@@ -97,21 +103,69 @@ function url_manager_2024_handle_submission() {
             foreach ($csv_data as $row) {
                 $url = esc_url_raw(trim($row[0]));
                 if (!empty($url)) {
-                    // Insert URL if not a duplicate
-                    $wpdb->insert($table_name, array('url' => $url, 'url_list_name' => 'CSV'));
+                    // Check if URL already exists in the database
+                    $existing_url = $wpdb->get_var($wpdb->prepare("SELECT url FROM $table_name WHERE url = %s", $url));
+                    if (!$existing_url) {
+                        $wpdb->insert($table_name, array('url' => $url, 'url_list_name' => 'CSV'));
+                        $new_urls[] = $url;  // Store new URL for CSV creation later
+                    }
                 }
             }
+
+            // Check if the original CSV file or folder is empty, if so, create or update the CSV
+            url_manager_2024_create_or_update_csv($csv_file);
         }
 
-        // After processing URLs, export them to CSV
-        url_manager_2024_export_to_csv();
+        // If there are any new unique URLs, create a new CSV for them
+        if (!empty($new_urls)) {
+            url_manager_2024_create_new_csv_for_unique_urls($new_urls);
+        }
 
         echo '<div class="notice notice-success is-dismissible"><p>URLs processed and saved successfully.</p></div>';
     }
 }
 add_action('admin_init', 'url_manager_2024_handle_submission');
 
-// Export data to CSV file
+// Export data to CSV file (creates or updates CSV based on uploaded file)
+function url_manager_2024_create_or_update_csv($uploaded_csv) {
+    $csv_dir = WP_CONTENT_DIR . '/url-manager-2024';
+    $file = $csv_dir . '/url_manager_2024.csv';
+
+    // Check if the directory and CSV file exist or are empty
+    if (!file_exists($file) || filesize($file) === 0) {
+        copy($uploaded_csv, $file);  // Copy uploaded CSV to the target location
+    } else {
+        // Otherwise, update CSV content (optional: merge logic can be added if needed)
+        unlink($file);
+        copy($uploaded_csv, $file);
+    }
+}
+
+// Create a new CSV for unique URLs that are not duplicates in the database
+function url_manager_2024_create_new_csv_for_unique_urls($new_urls) {
+    $csv_dir = WP_CONTENT_DIR . '/url-manager-2024';
+    $unique_file = $csv_dir . '/url_manager_unique_urls_' . time() . '.csv';
+
+    // Open the file in write mode ('w')
+    $csv = fopen($unique_file, 'w');
+    if (!$csv) {
+        error_log('Failed to open unique URLs CSV file: ' . $unique_file);
+        return;
+    }
+
+    // Add headers to the unique URLs CSV
+    fputcsv($csv, array('url'));
+
+    // Add the unique URLs to the CSV
+    foreach ($new_urls as $url) {
+        fputcsv($csv, array($url));
+    }
+
+    // Close the CSV file
+    fclose($csv);
+}
+
+// Export all database data to the main CSV file
 function url_manager_2024_export_to_csv() {
     global $wpdb;
     $table_name = $wpdb->prefix . 'url_manager_2024';
@@ -141,5 +195,4 @@ function url_manager_2024_export_to_csv() {
     // Close the CSV file
     fclose($csv);
 }
-
 ?>
